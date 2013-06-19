@@ -44,7 +44,7 @@
  * @api
  */
 #define S2ST(sec)                                                           \
-  ((systime_t)((sec) * CH_FREQUENCY))
+  ((systime_t)((sec) * (long) CH_FREQUENCY))
 
 /**
  * @brief   Milliseconds to system ticks.
@@ -57,7 +57,7 @@
  * @api
  */
 #define MS2ST(msec)                                                         \
-  ((systime_t)((((msec) * CH_FREQUENCY - 1L) / 1000L) + 1L))
+  ((systime_t)((((msec) * (long) CH_FREQUENCY - 1L) / 1000L) + 1L))
 
 /**
  * @brief   Microseconds to system ticks.
@@ -70,7 +70,7 @@
  * @api
  */
 #define US2ST(usec)                                                         \
-  ((systime_t)((((usec) * CH_FREQUENCY - 1L) / 1000000L) + 1L))
+  ((systime_t)((((usec) * (long) CH_FREQUENCY - 1L) / 1000000L) + 1L))
 /** @} */
 
 /**
@@ -156,6 +156,8 @@ typedef struct {
 /**
  * @brief   Enables a virtual timer.
  * @note    The associated function is invoked from interrupt context.
+ *          The timer MUST NOT be already set when this function is invoked,
+ *          call chVTReset() before if there is a risk of this.
  *
  * @param[out] vtp      the @p VirtualTimer structure pointer
  * @param[in] time      the number of ticks before the operation timeouts, the
