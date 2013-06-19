@@ -41,7 +41,7 @@
 
 
 # MCU name
-MCU = atmega328
+MCU = atmega328p
 AVRDUDE_MCU = m328p
 
 
@@ -64,7 +64,7 @@ OBJDIR = .
 
 
 # Imported source files
-CHIBIOS = ../..
+CHIBIOS = ../../..
 include $(CHIBIOS)/boards/ARDUINO/board.mk
 include $(CHIBIOS)/os/hal/platforms/AVR/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk

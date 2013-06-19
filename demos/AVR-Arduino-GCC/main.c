@@ -54,7 +54,7 @@ int main(void) {
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
   while(TRUE) {
-	sdWriteTimeout(&SD1, (uint8_t *)"Hello World!\r\n", 14, 100);
+    chprintf((BaseSequentialStream *) &SD1, "Hello World!\r\n");
     chThdSleepMilliseconds(2000);
   }
 }
