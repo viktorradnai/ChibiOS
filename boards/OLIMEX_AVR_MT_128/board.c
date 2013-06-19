@@ -52,6 +52,7 @@ const PALConfig pal_default_config =
 /**
  * @brief   Timer0 interrupt handler.
  */
+#if 0
 CH_IRQ_HANDLER(TIMER0_COMP_vect) {
 
   CH_IRQ_PROLOGUE();
@@ -62,18 +63,18 @@ CH_IRQ_HANDLER(TIMER0_COMP_vect) {
 
   CH_IRQ_EPILOGUE();
 }
-
+#endif
 /**
  * Board-specific initialization code.
  */
 void boardInit(void) {
-
   /*
    * External interrupts setup, all disabled initially.
    */
   EICRA  = 0x00;
   EICRB  = 0x00;
   EIMSK  = 0x00;
+#if 0
 
   /*
    * Enables Idle mode for SLEEP instruction.
@@ -90,4 +91,5 @@ void boardInit(void) {
   TCNT0  = 0;                                           /* Reset counter.   */
   TIFR   = (1 << OCF0);                                 /* Reset pending.   */
   TIMSK  = (1 << OCIE0);                                /* IRQ on compare.  */
+#endif
 }
