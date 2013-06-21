@@ -1,0 +1,11 @@
+*.o
+.*.sw?
+*.lst
+*.lss
+.dep
+ch.elf
+ch.eep
+ch.hex
+ch.bin
+ch.sym
+ch.map
