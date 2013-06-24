@@ -16,6 +16,7 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
 
 static WORKING_AREA(waThread1, 32);
 static msg_t Thread1(void *arg) {
