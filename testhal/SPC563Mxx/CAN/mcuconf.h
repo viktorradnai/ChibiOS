@@ -43,7 +43,6 @@
                                              BIUCR_IPFEN |                  \
                                              BIUCR_PFLIM_ON_MISS |          \
                                              BIUCR_BFEN)
-#define SPC5_EMIOS_GPRE_VALUE               200
 
 /*
  * ADC driver settings.
@@ -78,22 +77,12 @@
 #define SPC5_ESCIB_PRIORITY                 8
 
 /*
- * ICU - PWM driver system settings.
+ * CAN driver system settings.
  */
-#define SPC5_ICU_USE_EMIOS_CH0              TRUE
-#define SPC5_ICU_USE_EMIOS_CH1              TRUE
-#define SPC5_ICU_USE_EMIOS_CH2              TRUE
-#define SPC5_ICU_USE_EMIOS_CH3              TRUE
-#define SPC5_ICU_USE_EMIOS_CH4              TRUE
-#define SPC5_ICU_USE_EMIOS_CH5              TRUE
-#define SPC5_ICU_USE_EMIOS_CH6              TRUE
-#define SPC5_ICU_USE_EMIOS_CH8              TRUE
+#define SPC5_CAN_USE_FILTERS                FALSE
 
-#define SPC5_PWM_USE_EMIOS_CH9              TRUE
-#define SPC5_PWM_USE_EMIOS_CH10             TRUE
-#define SPC5_PWM_USE_EMIOS_CH11             TRUE
-#define SPC5_PWM_USE_EMIOS_CH12             TRUE
-#define SPC5_PWM_USE_EMIOS_CH13             TRUE
-#define SPC5_PWM_USE_EMIOS_CH14             TRUE
-#define SPC5_PWM_USE_EMIOS_CH15             TRUE
-#define SPC5_PWM_USE_EMIOS_CH23             TRUE
+#define SPC5_CAN_USE_FLEXCAN0               TRUE
+#define SPC5_CAN_FLEXCAN0_IRQ_PRIORITY          2
+
+#define SPC5_CAN_USE_FLEXCAN1               FALSE
+#define SPC5_CAN_FLEXCAN1_IRQ_PRIORITY          11
