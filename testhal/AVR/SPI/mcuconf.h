@@ -59,3 +59,4 @@
  */
 
 #define AVR_SPI_USE_SPI1        TRUE
+#define AVR_SPI_USE_16BIT_POLLED_EXCHANGE FALSE

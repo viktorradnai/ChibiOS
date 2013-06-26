@@ -64,65 +64,17 @@ SPIDriver SPID1;
  *
  * @notapi
  */
-#if 0
-CH_IRQ_HANDLER(SPI_STC_vect) {
-  CH_IRQ_PROLOGUE();
-
-  SPIDriver *spip = &SPID1;
-  bool_t done;
-
-  /* spi_lld_exchange */
-  if (spip->rxbuf && spip->txbuf) { // tx and rx
-    spip->rxbuf[spip->rxidx++] = SPDR;  // receive
-    if (spip->rxidx == spip->rxbytes) { // rx done
-      _spi_isr_code(spip);
-    } else {
-      /* BUG: read beyond end of tx register possible */
-      SPDR = spip->txbuf[spip->txidx++]; // transmit
-    }
-  /* spi_lld_send */
-  } else if (spip->txbuf) { // tx only
-    if (spip->txidx < spip->txbytes) { 
-      SPDR = spip->txbuf[spip->txidx++]; // transmit
-    } else { // tx done
-      _spi_isr_code(spip);
-    }
-  /* spi_lld_receive */
-  } else if (spip->rxbuf) { // rx only
-    spip->rxbuf[spip->rxidx++] = SPDR;  // receive
-    if (spip->rxidx < spip->rxbytes) {
-      /* must keep clocking SCK */
-      SPDR = 0;
-    } else { // rx done
-      _spi_isr_code(spip);
-    }
-  /* spi_lld_ignore */
-  } else {
-    /* BUG: txidx is never incremented */
-    if (spip->txidx < spip->txbytes) {
-      SPDR = 0;
-    } else {
-      _spi_isr_code(spip);
-    }
-  }
-
-  CH_IRQ_EPILOGUE();
-}
-#endif
 CH_IRQ_HANDLER(SPI_STC_vect) {
   CH_IRQ_PROLOGUE();
 
   SPIDriver *spip = &SPID1;
 
-  /* spi_lld_exchange */
-  /* spi_lld_receive */
+  /* spi_lld_exchange or spi_lld_receive */
   if (spip->rxbuf && spip->rxidx < spip->rxbytes) {
     spip->rxbuf[spip->rxidx++] = SPDR;  // receive
   }
 
-  /* spi_lld_exchange */
-  /* spi_lld_send */
-  /* spi_lld_ignore */
+  /* spi_lld_exchange, spi_lld_send or spi_lld_ignore */
   if (spip->txidx < spip->txbytes) {
     if (spip->txbuf) { 
       SPDR = spip->txbuf[spip->txidx++]; // send
@@ -304,7 +256,10 @@ void spi_lld_stop(SPIDriver *spip) {
  * @notapi
  */
 void spi_lld_select(SPIDriver *spip) {
-
+  
+  /**
+   * NOTE: This should only be called in master mode 
+   */ 
   spip->config->ssport->out &= ~(1 << spip->config->sspad);
 
 }
@@ -319,6 +274,9 @@ void spi_lld_select(SPIDriver *spip) {
  */
 void spi_lld_unselect(SPIDriver *spip) {
 
+  /**
+   * NOTE: This should only be called in master mode 
+   */ 
   spip->config->ssport->out |= (1 << spip->config->sspad);
 
 }
@@ -428,7 +386,7 @@ void spi_lld_receive(SPIDriver *spip, size_t n, void *rxbuf) {
  * @param[in] frame     the data frame to send over the SPI bus
  * @return              The received data frame from the SPI bus.
  */
-#if 0
+#if AVR_SPI_USE_16BIT_POLLED_EXCHANGE
 uint16_t spi_lld_polled_exchange(SPIDriver *spip, uint16_t frame) {
 
   uint16_t spdr = 0;
@@ -452,7 +410,7 @@ uint16_t spi_lld_polled_exchange(SPIDriver *spip, uint16_t frame) {
 
   return spdr;
 }
-#endif
+#else /* AVR_SPI_USE_16BIT_POLLED_EXCHANGE */
 uint8_t spi_lld_polled_exchange(SPIDriver *spip, uint8_t frame) {
 
   uint8_t spdr = 0;
@@ -472,6 +430,7 @@ uint8_t spi_lld_polled_exchange(SPIDriver *spip, uint8_t frame) {
 
   return spdr;
 }
+#endif /* AVR_SPI_USE_16BIT_POLLED_EXCHANGE */
 
 #endif /* HAL_USE_SPI */
 

@@ -222,8 +222,13 @@ extern "C" {
                         const void *txbuf, void *rxbuf);
   void spi_lld_send(SPIDriver *spip, size_t n, const void *txbuf);
   void spi_lld_receive(SPIDriver *spip, size_t n, void *rxbuf);
-//  uint16_t spi_lld_polled_exchange(SPIDriver *spip, uint16_t frame);
+
+#if AVR_SPI_USE_16BIT_POLLED_EXCHANGE
+  uint16_t spi_lld_polled_exchange(SPIDriver *spip, uint16_t frame);
+#else
   uint8_t spi_lld_polled_exchange(SPIDriver *spip, uint8_t frame);
+#endif
+
 
 #ifdef __cplusplus
 }
