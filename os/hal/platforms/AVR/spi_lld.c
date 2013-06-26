@@ -131,30 +131,27 @@ void spi_lld_start(SPIDriver *spip) {
     /* Enables the peripheral.*/
 #if AVR_SPI_USE_SPI1
     if (&SPID1 == spip) {
-      /* enable SPI clock */
-/* Enable SPI power using Power Reduction Register */
+    /* Enable SPI clock using Power Reduction Register */
 #if defined(PRR0)
       PRR0 &= ~(1 << PRSPI);
 #elif defined(PRR)
       PRR &= ~(1 << PRSPI);
 #endif
 
-      /* SPI interrupt enable, SPI enable, Master mode */
-      // SPCR |= ((1 << SPE) | (1 << MSTR));
+      /* SPI enable, SPI interrupt enable */
       SPCR |= ((1 << SPE) | (1 << SPIE));
-      SPCR &= ~(1 << MSTR);
 
       switch (spip->config->role) {
       case SPI_ROLE_SLAVE:
-        SPCR &= ~(1 << MSTR);
-        DDR_SPI1 |=  (1 << SPI1_MISO);                                      /* output */
-        DDR_SPI1 &= ~((1 << SPI1_MOSI) | (1 << SPI1_SCK) | (1 << SPI1_SS)); /* input  */
+        SPCR &= ~(1 << MSTR);                                          /* master mode */
+        DDR_SPI1 |=  (1 << SPI1_MISO);                                 /*      output */
+        DDR_SPI1 &= ~((1 << SPI1_MOSI) | (1 << SPI1_SCK) | (1 << SPI1_SS)); /*  input */
         break;
       case SPI_ROLE_MASTER: /* fallthrough */
       default:
-        SPCR |= (1 << MSTR);
-        DDR_SPI1 |=  ((1 << SPI1_MOSI) | (1 << SPI1_SCK)); /* output */
-        DDR_SPI1 &= ~(1 << SPI1_MISO);                    /* input  */
+        SPCR |= (1 << MSTR);                                            /* slave mode */
+        DDR_SPI1 |=  ((1 << SPI1_MOSI) | (1 << SPI1_SCK));              /*     output */
+        DDR_SPI1 &= ~(1 << SPI1_MISO);                                  /*      input */
         spip->config->ssport->dir |= (1 << spip->config->sspad);
       }
 
@@ -238,7 +235,7 @@ void spi_lld_stop(SPIDriver *spip) {
       SPCR &= ((1 << SPIE) | (1 << SPE));
       spip->config->ssport->dir &= ~(1 << spip->config->sspad);
     }
-/* Disable SPI power using Power Reduction Register */
+/* Disable SPI clock using Power Reduction Register */
 #if defined(PRR0)
       PRR0 |= (1 << PRSPI);
 #elif defined(PRR)
