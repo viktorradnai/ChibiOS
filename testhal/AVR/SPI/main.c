@@ -26,13 +26,16 @@
 // #define SPI_ROLE SPI_ROLE_SLAVE
 #define SPI_ROLE SPI_ROLE_MASTER
 #if (SPI_ROLE == SPI_ROLE_MASTER)
-	#define MSG 'M'
+	#define ROLE "Master"
+    char msg[] = "Message from master\r\n";
 #else
-	#define MSG 'S'
+	#define ROLE "Slave"
+    char msg[] = "Message from slave\r\n";
 #endif
 
 void spicallback(SPIDriver *spip){
-  chprintf((BaseSequentialStream *) &SD1,"CB\r\n");
+  chSequentialStreamPut(&SD1, '.');
+  spip->txbuf = 0; // terminating null
 }
 
 /*
@@ -63,31 +66,26 @@ int main(void) {
 
   halInit();
   chSysInit();
-  palSetPad(IOPORTSPI1, SPI1_SS);
-  palClearPad(IOPORTSPI1, SPI1_SS);
-
-  palSetGroupMode(IOPORTSPI1, 0x3f, 0, PAL_MODE_INPUT_PULLUP);
-  palSetPadMode(IOPORTSPI1, SPI1_MISO, PAL_MODE_OUTPUT_PUSHPULL);
 
   spiStart(&SPID1, &spicfg);
   sdStart(&SD1, NULL);
 
-  chprintf((BaseSequentialStream *) &SD1, "Start\r\n");
+  chprintf((BaseSequentialStream *) &SD1, "Start %s\r\n", role);
 
-  while(1){
-      uint8_t temp;
-#if (SPI_ROLE == SPI_ROLE_MASTER)
-      spi_lld_select(&SPID1);
-#endif
-      temp = spiPolledExchange(&SPID1, MSG);
-      chprintf(&SD1,"temp1: %x SPCR: %x, SPSR: %x, SPDR: %c, PORTB %x, DDRB: %x\r\n",temp,SPCR,SPSR,SPDR,PORTB, DDRB);
+  while(1) {
+    char buf[24];
 
 #if (SPI_ROLE == SPI_ROLE_MASTER)
-      spi_lld_unselect(&SPID1);
-      chprintf((BaseSequentialStream *) &SD1, "Master\r\n");
+    spiSelect(&SPID1);
+    spiExchange(&SPID1, sizeof(msg), msg, buf);
+    spiUnselect(&SPID1);
+
+    chprintf((BaseSequentialStream *) &SD1,"%s: %s\r\n", role, buf);      
+    chThdSleepMilliseconds(500);
 #else
-      chprintf((BaseSequentialStream *) &SD1, "Slave\r\n");
+    spiExchange(&SPID1, sizeof(msg), msg, buf);
+    chprintf((BaseSequentialStream *) &SD1,"%s: %s\r\n", role, buf);
 #endif
-      chThdSleepMilliseconds(500);
+
   }
 }
