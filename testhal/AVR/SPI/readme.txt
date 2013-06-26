@@ -11,8 +11,8 @@ The demo runs on an Arduino board.
 Connect the SPI interfaces of two Arduino boards. Configure one as master, the other
 as slave using the #define statement in main.c. 
 
-Once the master starts running, the two boards will exchange a single character
-message (master sends 'm', slave sends 's').
+Once the master starts running, the two boards will exchange messages using SPI 
+and output the messages over the USB serial port.
  
 ** Build Procedure **
 
