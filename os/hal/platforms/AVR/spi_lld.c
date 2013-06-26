@@ -132,7 +132,7 @@ CH_IRQ_HANDLER(SPI_STC_vect) {
   }
 
   /* spi_lld_send */
-  if (spip->rxidx < spip->rxbytes) { /* rx not done */
+  else if (spip->rxidx < spip->rxbytes) { /* rx not done */
     SPDR = 0; // dummy send to keep the clock going
   }
 
@@ -428,6 +428,7 @@ void spi_lld_receive(SPIDriver *spip, size_t n, void *rxbuf) {
  * @param[in] frame     the data frame to send over the SPI bus
  * @return              The received data frame from the SPI bus.
  */
+#if 0
 uint16_t spi_lld_polled_exchange(SPIDriver *spip, uint16_t frame) {
 
   uint16_t spdr = 0;
@@ -443,6 +444,26 @@ uint16_t spi_lld_polled_exchange(SPIDriver *spip, uint16_t frame) {
   SPDR = frame & 0xFF;
   while (!(SPSR & (1 << SPIF))) ;
   spdr |= SPDR;
+
+  dummy = SPSR;
+  dummy = SPDR;
+  (void) dummy; /* suppress warning about unused variable */
+  SPCR |= (1 << SPIE);
+
+  return spdr;
+}
+#endif
+uint8_t spi_lld_polled_exchange(SPIDriver *spip, uint8_t frame) {
+
+  uint8_t spdr = 0;
+  uint8_t dummy;
+
+  /* disable interrupt */
+  SPCR &= ~(1 << SPIE);
+
+  SPDR = frame;
+  while (!(SPSR & (1 << SPIF))) ;
+  spdr = SPDR;
 
   dummy = SPSR;
   dummy = SPDR;
